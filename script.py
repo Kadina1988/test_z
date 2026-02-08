@@ -2,15 +2,11 @@ import csv
 import argparse
 from tabulate import tabulate
 
-parser = argparse.ArgumentParser(description='Arguments for script')
-parser.add_argument('files', nargs='+', type=str, help='path to files')
-parser.add_argument('--report', type=str, help='report')
 
-args = parser.parse_args()
 
 def outline(files, report):
     """Создаем и выводим таблицу в консоль"""
-    data_list = parse_data(files)
+    data_list = parse_csv(files)
     calculate_report = prepare_report(data_list, report)
     
     table = tabulate(
@@ -21,14 +17,20 @@ def outline(files, report):
     return table
 
 
-def parse_data(files):
-    list_country = []
+def parse_csv(files:list):
+    """
+    Парсит csv файлы 
+    аргументы передаются в списке при вызове с использованием argparse
+    возврацает список
+    При получении в аргументах несуществующего файла выдает исключение
+    """
+    data = []
     for f in files:
         with open(f, mode='r', newline='') as file:
             reader = csv.DictReader(file)
             for row in reader:
-                list_country.append(row)
-    return list_country     
+                data.append(row)
+    return data     
 
 
 def prepare_report(data, key):
@@ -52,9 +54,12 @@ def prepare_report(data, key):
     return sorted_data
 
 
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description='Arguments for script')
+    parser.add_argument('files', nargs='+', type=str, help='path to files')
+    parser.add_argument('--report', type=str, help='report')
+    args = parser.parse_args()
+    
+    print(outline(args.files, args.report))
 
-
-
-print(outline(args.files, args.report))
    
-
