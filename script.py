@@ -8,38 +8,53 @@ parser.add_argument('--report', type=str, help='report')
 
 args = parser.parse_args()
 
+def outline(files, report):
+    """Создаем и выводим таблицу в консоль"""
+    data_list = parse_data(files)
+    calculate_report = prepare_report(data_list, report)
+    
+    table = tabulate(
+        calculate_report,
+        headers=['Country', report],
+        tablefmt='grid'
+    )
+    return table
 
-def data_analysis(files ,report):
+
+def parse_data(files):
     list_country = []
     for f in files:
         with open(f, mode='r', newline='') as file:
             reader = csv.DictReader(file)
             for row in reader:
                 list_country.append(row)
+    return list_country     
 
+
+def prepare_report(data, key):
+    """Составляет словарь считает сколько строк с каждой страной, и добавляет данные для запрашиваемого отчета """
     countries = {}
-
-    for el in list_country:
+    for el in data:
         if el['country'] not in countries:
-            countries[el['country']] = {'count': 1, report: float(el[report])}
+            countries[el['country']] = {'count': 1, key: float(el[key])}
         else:
             countries[el['country']]['count'] += 1    
-            countries[el['country']][report] += float(el[report])    
-
-    for k, v in countries.items():
-        v['gdp'] = round(v[report] / v['count'], 2)
-        del v['count']
+            countries[el['country']][key] += float(el[key])    
     
-    sort_list = sorted([[name, data[report]] for name, data in countries.items()], key=lambda x: x[1], reverse=True)
+    """Подсчитывает среднее значение для отчета"""
+    for k, v in countries.items():
+        v[key] = round(v[key] / v['count'], 2)
+        del v['count']
 
-    table = tabulate(
-        sort_list,
-        headers=['Country', report],
-        tablefmt='grid'
-    )
-
-    print(table)
+    """Сортируем данные по убыванию"""
+    sorted_data = sorted([[name, calculate_data[key]] for name, calculate_data in countries.items()], key=lambda x: x[1], reverse=True)
+    
+    return sorted_data
 
 
-data_analysis(args.files, args.report)    
-# print(args.files)
+
+
+
+print(outline(args.files, args.report))
+   
+
