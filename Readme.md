@@ -10,8 +10,9 @@
 `python -m pip install -r requirements`  
   
 Пример запуска скрипта:  
-`python script.py 'files/economic1.csv' 'files/economic2.csv' --report='population'`
-  
+`python script.py 'files/economic1.csv' 'files/economic2.csv' --report='population'`  
+Можно добавлять один или несколько csv файлов.
+
 Запуск тестов:  
 `pytest tests/test_script.py`
 
